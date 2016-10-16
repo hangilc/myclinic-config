@@ -1,6 +1,6 @@
 {
   "name": "myclinic-config",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Configuration module for myclinic.",
   "main": "index.js",
   "scripts": {
