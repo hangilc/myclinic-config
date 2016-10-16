@@ -3,7 +3,7 @@
 var fs = require("fs");
 var ini = require("ini");
 
-var config = ini.parse(fs.readFileSync("./default-config.ini", "utf-8"));
+var config = ini.parse(fs.readFileSync(__dirname + "/default-config.ini", "utf-8"));
 
 function composeStringReturnValue(src){
 	if( src.lastIndexOf("env:", 0) === 0 ){
