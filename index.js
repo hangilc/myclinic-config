@@ -1,62 +1,46 @@
 "use strict";
 
 var fs = require("fs");
-var ini = require("ini");
 
-var config = ini.parse(fs.readFileSync(__dirname + "/default-config.ini", "utf-8"));
-
-function composeStringReturnValue(src){
-	if( src.lastIndexOf("env:", 0) === 0 ){
-		return process.env[src.substr(4)];
-	} else {
-		return src;
-	}
+function Config(){
+	this.config = {};
 }
 
-function composeObjectReturnValue(src){
-	var ret = {};
-	Object.keys(src).forEach(function(key){
-		var val = src[key];
-		ret[key] = composeReturnValue(val);
+Config.prototype.get = function(key){
+	return this.config[key];
+};
+
+Config.prototype.set = function(key, value){
+	this.config[key] = value;
+};
+
+Config.prototype.extend = function(key, obj){
+	if( this.config[key] === undefined ){
+		this.config[key] = {};
+	}
+	var dst = this.config[key];
+	Object.keys(obj).forEach(function(key){
+		dst[key] = obj[key];
 	});
-	return ret;
-}
+};
 
-function composeReturnValue(src){
-	switch(typeof src){
-		case "string": return composeStringReturnValue(src);
-		case "object": return composeObjectReturnValue(src);
-		default: return src;
+Config.prototype.addDefaults = function(key, obj){
+	if( this.config[key] === undefined ){
+		this.config[key] = {};
 	}
-}
-
-function parseStringValue(value){
-	return value;
-}
-
-function mergeConfig(dst, src){
-	Object.keys(src).forEach(function(key){
-		var srcValue = src[key];
-		if( typeof srcValue === "object" ){
-			var dstValue = dst[key];
-			if( typeof dstValue === "object" && dstValue !== null ){
-				mergeConfig(dstValue, srcValue);
-			} else {
-				dst[key] = srcValue;
-			}
-		} else {
-			dst[key] = srcValue;
+	var dst = this.config[key];
+	Object.keys(obj).forEach(function(key){
+		if( !(key in dst) ){
+			dst[key] = obj[key];
 		}
 	});
-}
-
-exports.get = function(key){
-	var value = config[key];
-	return composeReturnValue(value);
 };
 
-exports.read = function(path){
-	var content = fs.readFileSync(path, "utf-8");
-	var newConfig = ini.parse(content);
-	mergeConfig(config, newConfig);
+Config.prototype.readDir = function(dirpath){
+	fs.readdirSync(dirpath).forEach(function(path){
+		console.log(path);
+	});
 };
+
+module.exports = Config;
+
