@@ -51,14 +51,12 @@ function isConfigFile(filename){
 }
 
 Config.prototype.readJs = function(key, pathname){
-	console.log(pathname);
 	var obj = require(pathname);
 	this.set(key, obj);
 };
 
 Config.prototype.readIni = function(key, pathname){
 	var src = fs.readFileSync(pathname);
-	console.log(src);
 	throw new Error("not implemented yet");
 };
 
