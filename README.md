@@ -1,4 +1,4 @@
-# myclinic-db
+# myclinic-config
 
 Configuration module for myclinic.
 
