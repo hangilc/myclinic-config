@@ -69,7 +69,7 @@ Config.prototype.readIndex = function(pathname){
 	var conf = require(pathname);
 	Object.keys(conf).forEach(function(key){
 		this.set(key, conf[key]);
-	});
+	}, this);
 }
 
 Config.prototype.readDir = function(dirpath){
