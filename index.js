@@ -65,14 +65,25 @@ Config.prototype.readJson = function(key, pathname){
 	this.set(key, JSON.parse(src));
 };
 
+Config.prototype.readIndex = function(pathname){
+	var conf = require(pathname);
+	Object.keys(conf).forEach(function(key){
+		this.set(key, conf[key]);
+	});
+}
+
 Config.prototype.readDir = function(dirpath){
 	fs.readdirSync(dirpath).forEach(function(filename){
+		var fullpath = path.join(dirpath, filename);
+		if( filename === "index.js" ){
+			this.readIndex(fullpath);
+			return;
+		}
 		var m = isConfigFile(filename);
 		if( !m ){
 			return;
 		}
 		var key = m.name;
-		var fullpath = path.join(dirpath, filename);
 		switch(m.ext){
 			case "js": this.readJs(key, fullpath); break;
 			case "ini": this.readIni(key, fullpath); break;
@@ -82,9 +93,8 @@ Config.prototype.readDir = function(dirpath){
 	}, this);
 };
 
-exports.create = function(){
+exports.create = function(configDir){
 	var config = new Config();
-	var configDir = process.env.MYCLINIC_CONFIG_DIR;
 	if( configDir ){
 		config.readDir(configDir);
 	}
