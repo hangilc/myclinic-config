@@ -14,14 +14,14 @@ describe("testing readX", function(){
 	});
 
 	it("readJson", function(){
-		var path = "./test-config/config-a.json";
+		var path = "./test-config/a.json";
 		var config = Config.readJson(path);
 		var content = JSON.parse(fs.readFileSync(path));
 		expect(config).eql(content);
 	});
 
 	it("readIni", function(){
-		var path = "./test-config/config-b.ini";
+		var path = "./test-config/b.ini";
 		var config = Config.readIni(path);
 		var content = ini.parse(fs.readFileSync(path, "utf-8"));
 		expect(config).eql(content);
@@ -30,10 +30,11 @@ describe("testing readX", function(){
 	it("readDir", function(){
 		var config = Config.readDir("./test-config");
 		var content = Config.readJs("./test-config/index.js");
-		content["a"] = Config.readJson("./test-config/config-a.json");
-		content["b"] = Config.readIni("./test-config/config-b.ini");
-		content["c"] = Config.readJs("./test-config/config-c.js");
-		content["d"] = fs.readFileSync("./test-config/config-d.txt");
+		content["a"] = Config.readJson("./test-config/a.json");
+		content["b"] = Config.readIni("./test-config/b.ini");
+		content["c"] = Config.readJs("./test-config/c.js");
+		content["d"] = fs.readFileSync("./test-config/d.txt");
+		content["e"] = Config.readDir("./test-config/e");
 		expect(config).eql(content);
 	});
 });
@@ -47,14 +48,14 @@ describe("testing read", function(){
 	});
 
 	it("read .json", function(){
-		var path = "./test-config/config-a.json";
+		var path = "./test-config/a.json";
 		var config = Config.read(path);
 		var content = JSON.parse(fs.readFileSync(path));
 		expect(config).eql(content);
 	});
 
 	it("read .ini", function(){
-		var path = "./test-config/config-b.ini";
+		var path = "./test-config/b.ini";
 		var config = Config.read(path);
 		var content = ini.parse(fs.readFileSync(path, "utf-8"));
 		expect(config).eql(content);
@@ -63,10 +64,11 @@ describe("testing read", function(){
 	it("readDir", function(){
 		var config = Config.read("./test-config");
 		var content = Config.readJs("./test-config/index.js");
-		content["a"] = Config.readJson("./test-config/config-a.json");
-		content["b"] = Config.readIni("./test-config/config-b.ini");
-		content["c"] = Config.readJs("./test-config/config-c.js");
-		content["d"] = fs.readFileSync("./test-config/config-d.txt");
+		content["a"] = Config.readJson("./test-config/a.json");
+		content["b"] = Config.readIni("./test-config/b.ini");
+		content["c"] = Config.readJs("./test-config/c.js");
+		content["d"] = fs.readFileSync("./test-config/d.txt");
+		content["e"] = Config.readDir("./test-config/e");
 		expect(config).eql(content);
 	});
 });

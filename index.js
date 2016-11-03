@@ -4,34 +4,6 @@ var fs = require("fs");
 var path = require("path");
 var ini = require("ini");
 
-function readIndex (config, pathname){
-	var conf = require(pathname);
-	Object.keys(conf).forEach(function(key){
-		config[key] = conf[key];
-	});
-}
-
-function readDir (config, dirpath){
-	fs.readdirSync(dirpath).forEach(function(filename){
-		var fullpath = path.join(dirpath, filename);
-		if( filename === "index.js" ){
-			readIndex(config, fullpath);
-			return;
-		}
-		var m = isConfigFile(filename);
-		if( !m ){
-			return;
-		}
-		var key = m.name;
-		switch(m.ext){
-			case "js": this.readJs(key, fullpath); break;
-			case "ini": this.readIni(key, fullpath); break;
-			case "json": this.readJson(key, fullpath); break;
-			default: throw new Error("cannot handle config file: " + fullpath);
-		}
-	}, this);
-};
-
 exports.readJs = function(filepath){
 	return require(path.resolve(filepath));
 }
@@ -58,19 +30,23 @@ exports.extend = function(dst){
 
 exports.readDir = function(dirpath){
 	var config = {};
-	var prefix = "config-";
-	var prefixSize = prefix.length;
 	fs.readdirSync(dirpath).forEach(function(filename){
 		var fullpath = path.join(dirpath, filename);
-		var c, p, key;
+		var c, p, stat, key;
 		if( filename === "index.js" ){
 			c = exports.readJs(fullpath);
 			exports.extend(config, c);
 			return;
 		}
-		if( filename.substring(0, prefixSize) === prefix ){
+		if( filename[0] === "." ){
+			return;
+		}
+		stat = fs.statSync(fullpath);
+		if( stat.isDirectory() ){
+			config[filename] = exports.readDir(fullpath);	
+		} if( stat.isFile() ){
 			p = path.parse(filename);
-			key = p.name.substring(prefixSize);
+			key = p.name;
 			switch(p.ext){
 				case ".js": config[key] = exports.readJs(fullpath); break;
 				case ".json": config[key] = exports.readJson(fullpath); break;
