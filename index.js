@@ -33,8 +33,9 @@ exports.readDir = function(dirpath){
 	fs.readdirSync(dirpath).forEach(function(filename){
 		var fullpath = path.join(dirpath, filename);
 		var c, p, stat, key;
-		if( filename === "index.js" ){
-			c = exports.readJs(fullpath);
+		p = path.parse(filename);
+		if( p.name == "index" ){
+			c = exports.read(fullpath);
 			exports.extend(config, c);
 			return;
 		}
@@ -45,7 +46,6 @@ exports.readDir = function(dirpath){
 		if( stat.isDirectory() ){
 			config[filename] = exports.readDir(fullpath);	
 		} if( stat.isFile() ){
-			p = path.parse(filename);
 			key = p.name;
 			switch(p.ext){
 				case ".js": config[key] = exports.readJs(fullpath); break;
