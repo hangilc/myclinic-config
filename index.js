@@ -8,69 +8,57 @@ exports.readJs = function(filepath){
 	return require(path.resolve(filepath));
 }
 
-exports.readJson = function(path){
-	var content = fs.readFileSync(path, "utf-8");
+exports.readJson = function(filepath){
+	var content = fs.readFileSync(filepath, "utf-8");
 	return JSON.parse(content);
 }
 
-exports.readIni = function(path){
-	var content = fs.readFileSync(path, "utf-8");
+exports.readIni = function(filepath){
+	var content = fs.readFileSync(filepath, "utf-8");
 	return ini.parse(content);
 };
 
-exports.extend = function(dst){
-	var n = arguments.length, i;
-	for(i=1;i<n;i++){
-		var src = arguments[i];
-		Object.keys(src).forEach(function(key){
-			dst[key] = src[key];
-		});
-	}
+exports.readText = function(filepath){
+	return fs.readFileSync(filepath, { encoding: "utf-8" });
 };
 
 exports.readDir = function(dirpath){
-	var config = {};
-	fs.readdirSync(dirpath).forEach(function(filename){
-		var fullpath = path.join(dirpath, filename);
-		var c, p, stat, key;
-		p = path.parse(filename);
-		if( p.name == "index" ){
-			c = exports.read(fullpath);
-			exports.extend(config, c);
-			return;
-		}
-		if( filename[0] === "." ){
-			return;
-		}
-		stat = fs.statSync(fullpath);
+	return exports.readJs(path.join(dirpath, "index.js"));
+};
+
+exports.read = function(confpath){
+	var cp = confpath;
+	if( fs.existsSync(cp) ){
+		var stat = fs.statSync(cp);
 		if( stat.isDirectory() ){
-			config[filename] = exports.readDir(fullpath);	
-		} if( stat.isFile() ){
-			key = p.name;
+			return exports.readDir(cp);
+		} else if( stat.isFile() ){
+			var p = path.parse(cp);
 			switch(p.ext){
-				case ".js": config[key] = exports.readJs(fullpath); break;
-				case ".json": config[key] = exports.readJson(fullpath); break;
-				case ".ini": config[key] = exports.readIni(fullpath); break;
-				case ".txt": config[key] = fs.readFileSync(fullpath); break;
-				default: throw new Error("cannot handle config file: " + fullpath);
+				case ".js": return exports.readJs(cp);
+				case ".json": return exports.readJson(cp);
+				case ".ini": return exports.readIni(cp);
+				case ".txt": return exports.readText(cp);
 			}
 		}
-	});
-	return config;
-}
-
-exports.read = function(fpath){
-	var stat = fs.statSync(fpath);
-	if( stat.isDirectory() ){
-		return exports.readDir(fpath);
-	} else if( stat.isFile() ){
-		var p = path.parse(fpath);
-		switch(p.ext){
-			case ".js": return exports.readJs(fpath);
-			case ".json": return exports.readJson(fpath);
-			case ".ini": return exports.readIni(fpath);
-		}
+		throw new Error("cannot handle config file: " + cp);
 	}
-	throw new Error("cannot handle config file: " + fpath);
+	cp = confpath + ".js";
+	if( fs.existsSync(cp) ){
+		return exports.readJs(cp);
+	}
+	cp = confpath + ".json";
+	if( fs.existsSync(cp) ){
+		return exports.readJson(cp);
+	}
+	cp = confpath + ".ini";
+	if( fs.existsSync(cp) ){
+		return exports.readIni(cp);
+	}
+	cp = confpath + ".txt";
+	if( fs.existsSync(cp) ){
+		return exports.readText(cp);
+	}
+	throw new Error("cannot find config: " + confpath);
 };
 
