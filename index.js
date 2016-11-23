@@ -26,6 +26,21 @@ exports.readDir = function(dirpath){
 	return exports.readJs(path.join(dirpath, "index.js"));
 };
 
+exports.readGlob = function(dirpath){
+	var items = fs.readdirSync(dirpath, { encoding: "utf-8" });
+	var obj = {};
+	items.forEach(function(item){
+		if( item[0] === "." ){
+			return;
+		}
+		var comps = path.parse(item);
+		var key = comps.name;
+		var val = exports.read(path.join(dirpath, item));
+		obj[key] = val;
+	});
+	return obj;
+};
+
 exports.read = function(confpath){
 	var cp = confpath;
 	if( fs.existsSync(cp) ){

@@ -111,3 +111,15 @@ describe("testing read without ext", function(){
 		expect(config).eql(content);
 	});
 });
+
+describe("testing readGlob", function(){
+	it("read g", function(){
+		var path = "./test-config/g";
+		var config = Config.readGlob(path);
+		var content = {};
+		["a", "b", "c", "d", "e"].forEach(function(sub){
+			content[sub] = Config.read(path + "/" + sub);
+		});
+		expect(config).eql(content);
+	});
+});
