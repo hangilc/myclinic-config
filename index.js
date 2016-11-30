@@ -74,6 +74,6 @@ exports.read = function(confpath){
 	if( fs.existsSync(cp) ){
 		return exports.readText(cp);
 	}
-	throw new Error("cannot find config: " + confpath);
+	return {};
 };
 
