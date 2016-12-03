@@ -41,7 +41,13 @@ exports.readGlob = function(dirpath){
 	return obj;
 };
 
-exports.read = function(confpath){
+exports.read = function(){
+	var confpath;
+	if( arguments.length > 1 ){
+		confpath = path.join.apply(path, arguments);
+	} else {
+		confpath = arguments[0];
+	}
 	var cp = confpath;
 	if( fs.existsSync(cp) ){
 		var stat = fs.statSync(cp);
