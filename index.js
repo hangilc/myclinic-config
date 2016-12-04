@@ -80,6 +80,6 @@ exports.read = function(){
 	if( fs.existsSync(cp) ){
 		return exports.readText(cp);
 	}
-	return {};
+	return null;
 };
 
